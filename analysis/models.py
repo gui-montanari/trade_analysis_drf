@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db import models
+from django.contrib.auth.models import User
 
 class UserSettings(models.Model):
     """Configurações personalizadas do usuário"""
@@ -217,3 +219,46 @@ class UserNotification(models.Model):
 
     def __str__(self):
         return f"{self.notification_type} for {self.user.username}"
+    
+
+class TradingNotification(models.Model):
+    NOTIFICATION_TYPES = [
+        ('signal', 'Sinal de Trading'),
+        ('alert', 'Alerta de Preço'),
+        ('risk', 'Aviso de Risco'),
+    ]
+
+    TRADING_TYPES = [
+        ('futures', 'Futures'),
+        ('day', 'Day Trading'),
+        ('swing', 'Swing'),
+        ('position', 'Position'),
+    ]
+
+    SIGNAL_TYPES = [
+        ('buy', 'Compra'),
+        ('sell', 'Venda'),
+        ('neutral', 'Neutro'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    notification_type = models.CharField(max_length=10, choices=NOTIFICATION_TYPES)
+    trading_type = models.CharField(max_length=10, choices=TRADING_TYPES)
+    signal_type = models.CharField(max_length=10, choices=SIGNAL_TYPES)
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    price = models.DecimalField(max_digits=20, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+    read = models.BooleanField(default=False)
+    read_at = models.DateTimeField(null=True, blank=True)
+    importance = models.IntegerField(default=1)  # 1-Normal, 2-Important, 3-Critical
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'created_at']),
+            models.Index(fields=['notification_type', 'trading_type']),
+        ]
+
+    def __str__(self):
+        return f"{self.get_notification_type_display()} - {self.title}"

@@ -1,126 +1,128 @@
 :root {
-    --primary-color: #16c784;
-    --secondary-color: #ea3943;
-    --dark-bg: #1a1d26;
-    --card-bg: #2c2f36;
-    --text-color: #fff;
-    --border-color: rgba(255,255,255,0.1);
-}
+    --primary-color: #2ecc71; /* Verde claro */
+    --secondary-color: #e74c3c; /* Vermelho claro */
+    --dark-bg: #f0f4f8; /* Cinza muito claro */
+    --card-bg: #ffffff; /* Branco puro */
+    --text-color: #333; /* Cinza escuro para melhor legibilidade */
+    --border-color: rgba(0, 0, 0, 0.1); /* Tons de borda mais suaves */
+  }
 
 body {
-    background-color: var(--dark-bg);
-    color: var(--text-color);
-    font-family: 'Inter', sans-serif;
+  background-color: var(--dark-bg);
+  color: var(--text-color);
+  font-family: "Inter", sans-serif;
 }
 
 /* Cards */
-.dashboard-card, .analysis-card, .market-info {
-    background-color: var(--card-bg);
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+.dashboard-card,
+.analysis-card,
+.market-info {
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .dashboard-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-}
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08); /* Redução da opacidade */
+  }
 
 /* Stats */
 .stats-card {
-    background: linear-gradient(45deg, var(--card-bg), var(--dark-bg));
-    border-radius: 12px;
-    padding: 20px;
-    border: 1px solid var(--border-color);
+  background: linear-gradient(45deg, var(--card-bg), var(--dark-bg));
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid var(--border-color);
 }
 
 .quick-stats {
-    font-size: 2rem;
-    font-weight: bold;
-    color: var(--text-color);
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--text-color);
 }
 
 /* Tables */
 .table {
-    color: var(--text-color);
-    border-color: var(--border-color);
+  color: var(--text-color);
+  border-color: var(--border-color);
 }
 
 .table-dark {
-    background-color: transparent;
+  background-color: transparent;
 }
 
 /* Badges */
 .badge {
-    padding: 0.5em 0.8em;
-    border-radius: 6px;
+  padding: 0.5em 0.8em;
+  border-radius: 6px;
 }
 
 .badge-buy {
-    background-color: var(--primary-color);
-}
-
+    background-color: #d4efdf; /* Verde pastel */
+  }
+  
 .badge-sell {
-    background-color: var(--secondary-color);
+background-color: #f9e2e1; /* Vermelho pastel */
 }
 
 /* Buttons */
 .btn-primary {
-    background-color: var(--primary-color);
-    border: none;
-}
-
+    background-color: #2ecc71;
+    color: #fff;
+  }
+  
 .btn-primary:hover {
-    background-color: #14b676;
+background-color: #27ae60; /* Um tom mais escuro para o hover */
 }
 
 .btn-outline-primary {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
 }
 
 .btn-outline-primary:hover {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 /* Navigation */
 .navbar {
-    background-color: var(--card-bg) !important;
-    border-bottom: 1px solid var(--border-color);
+  background-color: var(--card-bg) !important;
+  border-bottom: 1px solid var(--border-color);
 }
 
 /* Indicators */
 .indicator {
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.9rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.9rem;
 }
 
 .indicator-buy {
-    background-color: rgba(22, 199, 132, 0.2);
+    background-color: rgba(46, 204, 113, 0.1); /* Verde claro translúcido */
     color: var(--primary-color);
-}
-
+  }
+  
 .indicator-sell {
-    background-color: rgba(234, 57, 67, 0.2);
-    color: var(--secondary-color);
+background-color: rgba(231, 76, 60, 0.1); /* Vermelho claro translúcido */
+color: var(--secondary-color);
 }
 
 /* Market Stats */
 .market-stat {
-    padding: 12px;
-    border-bottom: 1px solid var(--border-color);
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .market-stat:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 /* Price Display */
 .price-large {
-    font-size: 2.5rem;
-    font-weight: bold;
-    line-height: 1.2;
+  font-size: 2.5rem;
+  font-weight: bold;
+  line-height: 1.2;
 }

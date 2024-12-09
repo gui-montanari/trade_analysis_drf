@@ -1,87 +1,94 @@
-from typing import Dict, List
 from django.contrib.auth.models import User
-from django.core.mail import send_mail
-from django.conf import settings
+from django.utils import timezone
+from django.db.models import Q
+from ..models import TradingNotification
 
 class NotificationService:
-    def __init__(self):
-        self.notification_types = {
-            'signal': self._send_signal_notification,
-            'alert': self._send_alert_notification,
-            'risk': self._send_risk_notification,
-            'system': self._send_system_notification
-        }
-    
-    def send_notification(self, user: User, notification_type: str, data: Dict) -> None:
-        """Envia uma notificação ao usuário"""
-        if notification_type in self.notification_types:
-            self.notification_types[notification_type](user, data)
-    
-    def _send_signal_notification(self, user: User, data: Dict) -> None:
-        """Envia notificação de sinal de trading"""
-        subject = f"Novo Sinal de Trading - {data['timeframe']}"
-        message = f"""
-        Novo sinal de trading detectado!
-        
-        Direção: {data['direction'].upper()}
-        Preço de Entrada: ${data['entry_price']}
-        Stop Loss: ${data['stop_loss']}
-        Take Profit: ${data['take_profit']}
-        Confiança: {data['confidence']}%
-        
-        Acesse a plataforma para mais detalhes.
-        """
-        
-        self._send_email(user, subject, message)
-    
-    def _send_alert_notification(self, user: User, data: Dict) -> None:
-        """Envia notificação de alerta de preço"""
-        subject = "Alerta de Preço Atingido"
-        message = f"""
-        Alerta de preço atingido!
-        
-        Preço Atual: ${data['price']}
-        Condição: {data['condition']}
-        Alvo: ${data['target']}
-        
-        {data['message']}
-        """
-        
-        self._send_email(user, subject, message)
-    
-    def _send_risk_notification(self, user: User, data: Dict) -> None:
-        """Envia notificação de risco"""
-        subject = f"Aviso de Risco - {data['risk_type']}"
-        message = f"""
-        Aviso de Risco Importante!
-        
-        Tipo: {data['risk_type']}
-        Severidade: {data['severity']}
-        
-        {data['message']}
-        
-        Recomendações:
-        {chr(10).join(f'- {r}' for r in data['recommendations'])}
-        """
-        
-        self._send_email(user, subject, message)
-    
-    def _send_system_notification(self, user: User, data: Dict) -> None:
-        """Envia notificação do sistema"""
-        subject = "Notificação do Sistema"
-        message = data['message']
-        
-        self._send_email(user, subject, message)
-    
-    def _send_email(self, user: User, subject: str, message: str) -> None:
-        """Envia email ao usuário"""
-        try:
-            send_mail(
-                subject=subject,
-                message=message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
-                fail_silently=False
+    @staticmethod
+    def create_signal_notification(user: User, analysis_data: dict, trading_type: str):
+        """Criar notificação baseada em sinais de trading"""
+        signal_type = analysis_data.get('signal_type', 'neutral')
+        confidence = analysis_data.get('confidence', 0)
+
+        # Só criar notificação se o sinal for forte o suficiente
+        if confidence >= 75:
+            importance = 3  # Critical
+        elif confidence >= 65:
+            importance = 2  # Important
+        else:
+            return None
+
+        message = (
+            f"Sinal de {analysis_data.get('signal', 'NEUTRO')} detectado!\n"
+            f"Preço: ${analysis_data.get('entry_price', 0):,.2f}\n"
+            f"Stop Loss: ${analysis_data.get('stop_loss', 0):,.2f}\n"
+            f"Take Profit: ${analysis_data.get('take_profit', 0):,.2f}\n"
+            f"Confiança: {confidence}%"
+        )
+
+        return TradingNotification.objects.create(
+            user=user,
+            notification_type='signal',
+            trading_type=trading_type,
+            signal_type=signal_type,
+            title=f"Novo sinal de {analysis_data.get('signal', 'NEUTRO')} - {trading_type.upper()}",
+            message=message,
+            price=analysis_data.get('entry_price', 0),
+            importance=importance
+        )
+
+    @staticmethod
+    def create_risk_notification(user: User, risk_data: dict, trading_type: str):
+        """Criar notificação de risco"""
+        if risk_data.get('risk_score', 0) >= 7:
+            message = (
+                f"Alto risco detectado!\n"
+                f"Score de Risco: {risk_data.get('risk_score')}/10\n"
+                f"Risco Máximo: {risk_data.get('max_risk')}%\n"
+                f"Recomendação: {risk_data.get('recommendations', ['Reduzir exposição'])[0]}"
             )
-        except Exception as e:
-            print(f"Error sending email: {e}")
+
+            return TradingNotification.objects.create(
+                user=user,
+                notification_type='risk',
+                trading_type=trading_type,
+                signal_type='neutral',
+                title=f"Aviso de Risco - {trading_type.upper()}",
+                message=message,
+                price=risk_data.get('current_price', 0),
+                importance=3  # Critical
+            )
+
+    @staticmethod
+    def get_user_notifications(user: User, limit: int = 10, unread_only: bool = False):
+        """Obter notificações do usuário"""
+        query = Q(user=user)
+        if unread_only:
+            query &= Q(read=False)
+
+        return TradingNotification.objects.filter(query)[:limit]
+
+    @staticmethod
+    def mark_as_read(notification_id: int, user: User) -> bool:
+        """Marcar notificação como lida"""
+        try:
+            notification = TradingNotification.objects.get(id=notification_id, user=user)
+            notification.read = True
+            notification.read_at = timezone.now()
+            notification.save()
+            return True
+        except TradingNotification.DoesNotExist:
+            return False
+
+    @staticmethod
+    def mark_all_as_read(user: User):
+        """Marcar todas as notificações do usuário como lidas"""
+        TradingNotification.objects.filter(user=user, read=False).update(
+            read=True,
+            read_at=timezone.now()
+        )
+
+    @staticmethod
+    def get_unread_count(user: User) -> int:
+        """Obter contagem de notificações não lidas"""
+        return TradingNotification.objects.filter(user=user, read=False).count()

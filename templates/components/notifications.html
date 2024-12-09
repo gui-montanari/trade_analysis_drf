@@ -1,0 +1,38 @@
+<div class="notifications-dropdown">
+    <div class="dropdown-header d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">Notificações</h6>
+        {% if unread_count > 0 %}
+            <button class="btn btn-link btn-sm text-primary mark-all-read">
+                Marcar todas como lidas
+            </button>
+        {% endif %}
+    </div>
+
+    <div class="notifications-list">
+        {% if notifications %}
+            {% for notification in notifications %}
+                <div class="notification-item {% if not notification.read %}unread{% endif %}" 
+                     data-id="{{ notification.id }}">
+                    <div class="notification-icon">
+                        {% if notification.notification_type == 'signal' %}
+                            <i class="fas fa-chart-line"></i>
+                        {% elif notification.notification_type == 'risk' %}
+                            <i class="fas fa-exclamation-triangle"></i>
+                        {% endif %}
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title">{{ notification.title }}</div>
+                        <div class="notification-message">{{ notification.message|linebreaksbr }}</div>
+                        <div class="notification-time">
+                            {{ notification.created_at|timesince }} ago
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-notifications">
+                Nenhuma notificação no momento
+            </div>
+        {% endif %}
+    </div>
+</div>

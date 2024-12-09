@@ -1,0 +1,86 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Configurações - Crypto Analyzer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">Configurações do Usuário</h2>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Preferências de Análise -->
+                        <h5 class="mb-3">Preferências de Análise</h5>
+                        <div class="mb-3">
+                            <label for="default_timeframe" class="form-label">Timeframe Padrão</label>
+                            <select class="form-select bg-dark text-light" id="default_timeframe" name="default_timeframe">
+                                <option value="1m">1 minuto</option>
+                                <option value="5m">5 minutos</option>
+                                <option value="15m">15 minutos</option>
+                                <option value="1h">1 hora</option>
+                                <option value="4h">4 horas</option>
+                                <option value="1d">1 dia</option>
+                            </select>
+                        </div>
+
+                        <!-- Configurações de Risco -->
+                        <h5 class="mb-3 mt-4">Gestão de Risco</h5>
+                        <div class="mb-3">
+                            <label for="max_risk" class="form-label">Risco Máximo por Operação (%)</label>
+                            <input type="number" class="form-control bg-dark text-light" id="max_risk" name="max_risk" 
+                                   min="0.1" max="10" step="0.1" value="2">
+                        </div>
+                        <div class="mb-3">
+                            <label for="max_leverage" class="form-label">Alavancagem Máxima</label>
+                            <input type="number" class="form-control bg-dark text-light" id="max_leverage" name="max_leverage" 
+                                   min="1" max="100" value="10">
+                        </div>
+
+                        <!-- Notificações -->
+                        <h5 class="mb-3 mt-4">Notificações</h5>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="email_notifications" name="email_notifications" checked>
+                            <label class="form-check-label" for="email_notifications">Receber notificações por email</label>
+                        </div>
+
+                        <!-- Interface -->
+                        <h5 class="mb-3 mt-4">Interface</h5>
+                        <div class="mb-3">
+                            <label for="update_interval" class="form-label">Intervalo de Atualização (segundos)</label>
+                            <input type="number" class="form-control bg-dark text-light" id="update_interval" name="update_interval" 
+                                   min="5" max="60" value="10">
+                        </div>
+
+                        <div class="text-end mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Salvar Configurações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.form-control:focus, .form-select:focus {
+    background-color: var(--dark-bg);
+    color: var(--text-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(22, 199, 132, 0.25);
+}
+</style>
+{% endblock %}

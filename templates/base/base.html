@@ -1,147 +1,270 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Crypto Analyzer{% endblock %}</title>
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
     <!-- Custom CSS -->
     {% block extra_css %}{% endblock %}
     <style>
-        :root {
-            --primary-color: #16c784;
-            --secondary-color: #ea3943;
-            --dark-bg: #1a1d26;
-            --card-bg: #2c2f36;
-            --text-color: #fff;
-        }
-        
-        body {
-            background-color: var(--dark-bg);
-            color: var(--text-color);
-            min-height: 100vh;
-        }
-        
-        .navbar {
-            background-color: var(--card-bg) !important;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary-color);
-            border: none;
-        }
-        
-        .btn-primary:hover {
-            background-color: #14b676;
-        }
-        
-        .text-success {
-            color: var(--primary-color) !important;
-        }
-        
-        .text-danger {
-            color: var(--secondary-color) !important;
-        }
+    :root {
+    --primary-color: #2ecc71; /* Verde claro */
+    --secondary-color: #e74c3c; /* Vermelho claro */
+    --dark-bg: #f4f6f8; /* Fundo claro */
+    --card-bg: #ffffff; /* Branco puro para os cartões */
+    --text-color: #333; /* Cinza escuro para texto */
+    }
+
+body {
+    background-color: var(--dark-bg);
+    color: var(--text-color);
+    min-height: 100vh;
+}
+
+.navbar {
+background-color: var(--card-bg) !important;
+border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* Linha sutil */
+}
+
+.navbar a {
+  color: var(--text-color); /* Usa o cinza escuro para contraste */
+  text-decoration: none; /* Remove sublinhado */
+}
+
+.navbar a:hover {
+  color: var(--primary-color); /* Destaque com o verde primário */
+}
+
+.nav-link {
+  color: var(--text-color); /* Garante contraste com o fundo */
+  font-weight: bold; /* Melhora a legibilidade */
+}
+
+.nav-link:hover {
+  color: var(--primary-color); /* Adiciona destaque ao passar o mouse */
+}
+
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+}
+
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border: none;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #27ae60; /* Um pouco mais escuro para contraste */
+}
+
+.text-success {
+    color: var(--primary-color) !important;
+}
+
+.text-danger {
+    color: var(--secondary-color) !important;
+}
+
+/* Submenu */
+.navbar .dropdown-menu {
+  background-color: var(--card-bg); /* Fundo claro consistente com os cartões */
+  border: 1px solid rgba(0, 0, 0, 0.1); /* Borda sutil */
+  border-radius: 8px; /* Cantos arredondados */
+}
+
+/* Links no submenu */
+.navbar .dropdown-menu a {
+  color: var(--text-color); /* Texto escuro para contraste */
+  padding: 10px 15px; /* Espaçamento confortável */
+  text-decoration: none;
+}
+
+/* Hover no submenu */
+.navbar .dropdown-menu a:hover {
+  background-color: rgba(46, 204, 113, 0.1); /* Fundo leve no hover (verde translúcido) */
+  color: var(--primary-color); /* Cor do texto no hover */
+}
+
+.navbar .dropdown-menu {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+/* Exibir submenu ao passar o mouse */
+.navbar .dropdown:hover .dropdown-menu {
+  display: block; /* Mostra o submenu ao passar o mouse */
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.2s ease-in-out;
+}
+
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="{% url 'index' %}">
-                <i class="fas fa-chart-line me-2"></i>
-                Crypto Analyzer
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'dashboard' %}">
-                                <i class="fas fa-tachometer-alt me-1"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-chart-bar me-1"></i> Análises
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-dark">
-                                <li><a class="dropdown-item" href="{% url 'analysis:futures' %}">Futures Trading</a></li>
-                                <li><a class="dropdown-item" href="{% url 'analysis:daytrading' %}">Day Trading</a></li>
-                                <li><a class="dropdown-item" href="{% url 'analysis:swing' %}">Swing Trading</a></li>
-                                <li><a class="dropdown-item" href="{% url 'analysis:position' %}">Position Trading</a></li>
-                            </ul>
-                        </li>
-                    {% endif %}
-                </ul>
-                <ul class="navbar-nav">
-                    {% if user.is_authenticated %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user-circle me-1"></i> {{ user.username }}
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
-                                <li><a class="dropdown-item" href="{% url 'users:settings' %}">Configurações</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'users:logout' %}">Sair</a></li>
-                            </ul>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'users:login' %}">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="btn btn-primary ms-2" href="{% url 'users:register' %}">Registrar</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
+     <!-- No navbar -->
+    <li class="nav-item dropdown">
+        <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown">
+            <i class="fas fa-bell"></i>
+            {% if unread_count > 0 %}
+                <span class="badge bg-danger">{{ unread_count }}</span>
+            {% endif %}
+        </a>
+        <div class="dropdown-menu dropdown-menu-end">
+            {% include 'components/notifications.html' %}
         </div>
+    </li>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container">
+        <a
+          class="navbar-brand d-flex align-items-center"
+          href="{% url 'index' %}"
+        >
+          <i class="fas fa-chart-line me-2"></i>
+          Crypto Analyzer
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto">
+            {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'dashboard:home' %}">
+                <i class="fas fa-tachometer-alt me-1"></i> Dashboard
+              </a>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
+                <i class="fas fa-chart-bar me-1"></i> Análises
+              </a>
+              <ul class="dropdown-menu dropdown-menu-dark">
+                <li>
+                  <a class="dropdown-item" href="{% url 'analysis:futures' %}"
+                    >Futures Trading</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'analysis:daytrading' %}"
+                    >Day Trading</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'analysis:swing' %}"
+                    >Swing Trading</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'analysis:position' %}"
+                    >Position Trading</a
+                  >
+                </li>
+              </ul>
+            </li>
+            {% endif %}
+          </ul>
+          <ul class="navbar-nav">
+            {% if user.is_authenticated %}
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
+                <i class="fas fa-user-circle me-1"></i> {{ user.username }}
+              </a>
+              <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                <li>
+                  <a class="dropdown-item" href="{% url 'users:settings' %}"
+                    >Configurações</a
+                  >
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'users:logout' %}"
+                    >Sair</a
+                  >
+                </li>
+              </ul>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'users:login' %}">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="btn btn-primary ms-2" href="{% url 'users:register' %}"
+                >Registrar</a
+              >
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
     </nav>
 
     <!-- Main Content -->
     <main class="container py-4">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-        
-        {% block content %}{% endblock %}
+      {% if messages %} {% for message in messages %}
+      <div
+        class="alert alert-{{ message.tags }} alert-dismissible fade show"
+        role="alert"
+      >
+        {{ message }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+      {% endfor %} {% endif %} {% block content %}{% endblock %}
     </main>
 
     <!-- Footer -->
     <footer class="bg-dark text-light py-4 mt-auto">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <p class="mb-0">&copy; 2024 Crypto Analyzer. Todos os direitos reservados.</p>
-                </div>
-                <div class="col-md-6 text-end">
-                    <a href="#" class="text-light me-3">Termos de Uso</a>
-                    <a href="#" class="text-light">Política de Privacidade</a>
-                </div>
-            </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <p class="mb-0">
+              &copy; 2024 Crypto Analyzer. Todos os direitos reservados.
+            </p>
+          </div>
+          <div class="col-md-6 text-end">
+            <a href="#" class="text-light me-3">Termos de Uso</a>
+            <a href="#" class="text-light">Política de Privacidade</a>
+          </div>
         </div>
+      </div>
     </footer>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     {% block extra_js %}{% endblock %}
-</body>
+  </body>
 </html>
