@@ -1,0 +1,126 @@
+:root {
+    --primary-color: #16c784;
+    --secondary-color: #ea3943;
+    --dark-bg: #1a1d26;
+    --card-bg: #2c2f36;
+    --text-color: #fff;
+    --border-color: rgba(255,255,255,0.1);
+}
+
+body {
+    background-color: var(--dark-bg);
+    color: var(--text-color);
+    font-family: 'Inter', sans-serif;
+}
+
+/* Cards */
+.dashboard-card, .analysis-card, .market-info {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+/* Stats */
+.stats-card {
+    background: linear-gradient(45deg, var(--card-bg), var(--dark-bg));
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+}
+
+.quick-stats {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+/* Tables */
+.table {
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.table-dark {
+    background-color: transparent;
+}
+
+/* Badges */
+.badge {
+    padding: 0.5em 0.8em;
+    border-radius: 6px;
+}
+
+.badge-buy {
+    background-color: var(--primary-color);
+}
+
+.badge-sell {
+    background-color: var(--secondary-color);
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--primary-color);
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #14b676;
+}
+
+.btn-outline-primary {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Navigation */
+.navbar {
+    background-color: var(--card-bg) !important;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Indicators */
+.indicator {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.indicator-buy {
+    background-color: rgba(22, 199, 132, 0.2);
+    color: var(--primary-color);
+}
+
+.indicator-sell {
+    background-color: rgba(234, 57, 67, 0.2);
+    color: var(--secondary-color);
+}
+
+/* Market Stats */
+.market-stat {
+    padding: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.market-stat:last-child {
+    border-bottom: none;
+}
+
+/* Price Display */
+.price-large {
+    font-size: 2.5rem;
+    font-weight: bold;
+    line-height: 1.2;
+}

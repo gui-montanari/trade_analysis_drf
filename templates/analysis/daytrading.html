@@ -1,0 +1,193 @@
+{% extends 'analysis/base_analysis.html' %}
+
+{% block title %}Análise Day Trading{% endblock %}
+
+{% block market_info %}
+<div class="market-info">
+    <div class="d-flex align-items-center mb-3">
+        <img src="https://assets.coingecko.com/coins/images/1/small/bitcoin.png" alt="Bitcoin" class="me-2" height="32">
+        <h2 class="mb-0">Bitcoin</h2>
+        <div class="ms-auto">
+            <select class="form-select bg-dark text-light" id="timeframe-selector">
+                <option value="1m">1m</option>
+                <option value="5m">5m</option>
+                <option value="15m">15m</option>
+                <option value="1h">1h</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="price-large mb-3">
+        ${{ price }}
+        <span class="text-{% if price_change >= 0 %}success{% else %}danger{% endif %} ms-2" style="font-size: 1rem;">
+            <i class="fas fa-caret-{% if price_change >= 0 %}up{% else %}down{% endif %}"></i>
+            {{ price_change|floatformat:2 }}%
+        </span>
+    </div>
+
+    <!-- Volume Profile -->
+    <div class="market-stat">
+        <h6>Volume Profile</h6>
+        <div class="progress bg-dark mb-2" style="height: 20px;">
+            <div class="progress-bar bg-success" style="width: {{ buy_volume_percent }}%">
+                Compra {{ buy_volume_percent }}%
+            </div>
+            <div class="progress-bar bg-danger" style="width: {{ sell_volume_percent }}%">
+                Venda {{ sell_volume_percent }}%
+            </div>
+        </div>
+    </div>
+
+    <!-- Support/Resistance -->
+    <div class="market-stat">
+        <h6>Níveis Importantes</h6>
+        <div class="mb-2">
+            <span class="text-muted">Resistência:</span>
+            <span class="float-end">${{ resistance|floatformat:2 }}</span>
+        </div>
+        <div class="mb-2">
+            <span class="text-muted">Suporte:</span>
+            <span class="float-end">${{ support|floatformat:2 }}</span>
+        </div>
+    </div>
+
+    <!-- VWAP -->
+    <div class="market-stat">
+        <h6>VWAP</h6>
+        <div class="d-flex justify-content-between">
+            <span>${{ vwap|floatformat:2 }}</span>
+            <span class="badge {% if price > vwap %}bg-success{% else %}bg-danger{% endif %}">
+                {{ price_to_vwap|floatformat:2 }}%
+            </span>
+        </div>
+    </div>
+
+    <!-- Intraday Indicators -->
+    <h5 class="mt-4 mb-3">Indicadores Intraday</h5>
+    {% for indicator in intraday_indicators %}
+    <div class="indicator-card {{ indicator.signal }}">
+        <div class="d-flex justify-content-between align-items-center">
+            <span>{{ indicator.name }}</span>
+            <span class="analysis-badge badge-{{ indicator.signal }}">
+                {{ indicator.value }}
+            </span>
+        </div>
+        {% if indicator.description %}
+        <small class="text-muted d-block mt-1">{{ indicator.description }}</small>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block analysis_content %}
+<div class="analysis-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>Análise Day Trading</h3>
+        <div>
+            <span class="analysis-badge badge-{{ signal_type }}">{{ signal }}</span>
+            <span class="ms-2 text-muted">Atualizado {{ last_update }}</span>
+        </div>
+    </div>
+
+    <!-- Market Context -->
+    <div class="card bg-darker mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Contexto de Mercado</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="text-muted">Tendência Intraday</div>
+                    <div class="h5 text-{{ intraday_trend.color }}">
+                        {{ intraday_trend.direction }}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-muted">Força da Tendência</div>
+                    <div class="h5">{{ trend_strength }}%</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-muted">Volatilidade</div>
+                    <div class="h5">{{ volatility|floatformat:1 }}%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trade Setup -->
+    <div class="card bg-darker mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Setup de Trade</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="p-3 rounded bg-opacity-10 {% if signal_type == 'buy' %}bg-success{% else %}bg-danger{% endif %}">
+                        <div class="text-muted mb-1">Entrada</div>
+                        <div class="h5 mb-0">${{ entry_price|floatformat:2 }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 rounded bg-danger bg-opacity-10">
+                        <div class="text-muted mb-1">Stop Loss</div>
+                        <div class="h5 mb-0">${{ stop_loss|floatformat:2 }}</div>
+                        <small class="text-muted">-{{ stop_loss_percent|floatformat:1 }}%</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 rounded bg-success bg-opacity-10">
+                        <div class="text-muted mb-1">Take Profit</div>
+                        <div class="h5 mb-0">${{ take_profit|floatformat:2 }}</div>
+                        <small class="text-muted">+{{ take_profit_percent|floatformat:1 }}%</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Risk Management -->
+    <div class="card bg-darker mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Gestão de Risco</h5>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h6>Métricas</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-chart-pie text-primary me-2"></i>
+                            Risco/Retorno: {{ risk_reward|floatformat:2 }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-percentage text-warning me-2"></i>
+                            Tamanho Posição Recomendado: {{ position_size|floatformat:1 }}%
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>Pontos de Atenção</h6>
+                    <ul class="list-unstyled">
+                        {% for point in attention_points %}
+                        <li class="mb-2">
+                            <i class="fas {{ point.icon }} text-{{ point.type }} me-2"></i>
+                            {{ point.text }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Day Trading Tips -->
+    <div class="card bg-darker">
+        <div class="card-body">
+            <h5 class="card-title">Recomendações para Day Trade</h5>
+            <ul class="list-unstyled mb-0">
+                {% for tip in day_trading_tips %}
+                <li class="mb-2">
+                    <i class="fas {{ tip.icon }} text-{{ tip.type }} me-2"></i>
+                    {{ tip.text }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

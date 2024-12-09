@@ -1,0 +1,201 @@
+{% extends 'analysis/base_analysis.html' %}
+
+{% block title %}Análise Position Trading{% endblock %}
+
+{% block market_info %}
+<div class="market-info">
+    <div class="d-flex align-items-center mb-3">
+        <img src="https://assets.coingecko.com/coins/images/1/small/bitcoin.png" alt="Bitcoin" class="me-2" height="32">
+        <h2 class="mb-0">Bitcoin</h2>
+        <div class="ms-auto">
+            <select class="form-select bg-dark text-light" id="timeframe-selector">
+                <option value="1d">1d</option>
+                <option value="1w">1w</option>
+                <option value="1m">1m</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="price-large mb-3">
+        ${{ price }}
+        <span class="text-{% if price_change >= 0 %}success{% else %}danger{% endif %} ms-2" style="font-size: 1rem;">
+            <i class="fas fa-caret-{% if price_change >= 0 %}up{% else %}down{% endif %}"></i>
+            {{ price_change|floatformat:2 }}%
+        </span>
+    </div>
+
+    <!-- Market Cycle -->
+    <div class="market-stat">
+        <h6>Ciclo de Mercado</h6>
+        <div class="progress bg-dark mb-2" style="height: 10px;">
+            <div class="progress-bar bg-primary" style="width: {{ cycle_progress }}%"></div>
+        </div>
+        <div class="d-flex justify-content-between">
+            <small class="text-muted">{{ cycle_phase }}</small>
+            <small class="text-muted">{{ cycle_progress }}%</small>
+        </div>
+    </div>
+
+    <!-- Market Dominance -->
+    <div class="market-stat">
+        <h6>Dominância do Bitcoin</h6>
+        <div class="d-flex justify-content-between">
+            <span>{{ dominance|floatformat:1 }}%</span>
+            <span class="badge {% if dominance_change >= 0 %}bg-success{% else %}bg-danger{% endif %}">
+                {{ dominance_change|floatformat:1 }}%
+            </span>
+        </div>
+    </div>
+
+    <!-- On-Chain Metrics -->
+    <div class="market-stat">
+        <h6>Métricas On-Chain</h6>
+        {% for metric in onchain_metrics %}
+        <div class="mb-2">
+            <div class="d-flex justify-content-between">
+                <span class="text-muted">{{ metric.name }}</span>
+                <span class="text-{{ metric.status }}">{{ metric.value }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Long Term Indicators -->
+    <h5 class="mt-4 mb-3">Indicadores de Longo Prazo</h5>
+    {% for indicator in longterm_indicators %}
+    <div class="indicator-card {{ indicator.signal }}">
+        <div class="d-flex justify-content-between align-items-center">
+            <span>{{ indicator.name }}</span>
+            <span class="analysis-badge badge-{{ indicator.signal }}">
+                {{ indicator.value }}
+            </span>
+        </div>
+        {% if indicator.description %}
+        <small class="text-muted d-block mt-1">{{ indicator.description }}</small>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block analysis_content %}
+<div class="analysis-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>Análise Position Trading</h3>
+        <div>
+            <span class="analysis-badge badge-{{ signal_type }}">{{ signal }}</span>
+            <span class="ms-2 text-muted">Atualizado {{ last_update }}</span>
+        </div>
+    </div>
+
+    <!-- Macro Analysis -->
+    <div class="card bg-darker mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Análise Macro</h5>
+            <div class="row g-3">
+                {% for factor in macro_factors %}
+                <div class="col-md-4">
+                    <div class="p-3 rounded bg-opacity-10 bg-{{ factor.color }}">
+                        <div class="text-muted mb-1">{{ factor.name }}</div>
+                        <div class="h5 mb-0">{{ factor.value }}</div>
+                        <small class="text-muted">{{ factor.description }}</small>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Investment Thesis -->
+    <div class="card bg-darker mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Tese de Investimento</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Fatores Bullish</h6>
+                    <ul class="list-unstyled">
+                        {% for factor in bullish_factors %}
+                        <li class="mb-2">
+                            <i class="fas fa-arrow-up text-success me-2"></i>
+                            {{ factor }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>Fatores Bearish</h6>
+                    <ul class="list-unstyled">
+                        {% for factor in bearish_factors %}
+                        <li class="mb-2">
+                            <i class="fas fa-arrow-down text-danger me-2"></i>
+                            {{ factor }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Position Strategy -->
+    <div class="card bg-darker mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Estratégia de Posição</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="p-3 rounded bg-opacity-10 bg-primary">
+                        <h6>Entrada</h6>
+                        <div class="mb-2">
+                            <span class="text-muted">Preço Base:</span>
+                            <span class="float-end">${{ entry_price|floatformat:2 }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="text-muted">Zonas de Acumulação:</span>
+                            <span class="float-end">${{ accumulation_zones }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 rounded bg-opacity-10 bg-success">
+                        <h6>Alvos</h6>
+                        {% for target in price_targets %}
+                        <div class="mb-2">
+                            <span class="text-muted">{{ target.name }}:</span>
+                            <span class="float-end">${{ target.price|floatformat:2 }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Risk Management -->
+    <div class="card bg-darker">
+        <div class="card-body">
+            <h5 class="card-title">Gestão de Risco e Portfolio</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Alocação Recomendada</h6>
+                    <div class="progress bg-dark mb-3" style="height: 24px;">
+                        <div class="progress-bar bg-primary" style="width: {{ allocation_percentage }}%">
+                            {{ allocation_percentage }}% do Portfolio
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6>Estratégia DCA</h6>
+                    <ul class="list-unstyled">
+                        {% for point in dca_strategy %}
+                        <li class="mb-2">
+                            <i class="fas {{ point.icon }} text-{{ point.color }} me-2"></i>
+                            {{ point.text }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

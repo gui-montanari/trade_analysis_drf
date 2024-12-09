@@ -1,0 +1,198 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Dashboard - Crypto Analyzer{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2>Olá, {{ user.username }}!</h2>
+        <p class="text-muted">Bem-vindo ao seu painel de análise de criptomoedas</p>
+    </div>
+    <div class="col-md-6 text-end">
+        <button class="btn btn-primary refresh-data">
+            <i class="fas fa-sync-alt me-2"></i>Atualizar Dados
+        </button>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="text-muted mb-2">Bitcoin Price</h6>
+                <div class="h3 mb-0">$42,350</div>
+                <small class="text-success">
+                    <i class="fas fa-caret-up"></i> 2.5%
+                </small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="text-muted mb-2">24h Volume</h6>
+                <div class="h3 mb-0">$28.5B</div>
+                <small class="text-danger">
+                    <i class="fas fa-caret-down"></i> 1.2%
+                </small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="text-muted mb-2">Dominance</h6>
+                <div class="h3 mb-0">48.2%</div>
+                <small class="text-success">
+                    <i class="fas fa-caret-up"></i> 0.5%
+                </small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="text-muted mb-2">Market Sentiment</h6>
+                <div class="h3 mb-0">Bullish</div>
+                <span class="badge bg-success">Strong</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Analysis Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4>Análises Recentes</h4>
+                    <a href="#" class="btn btn-sm btn-outline-primary">Ver Todas</a>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="#" class="list-group-item bg-transparent text-light">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Futures Trading Analysis</h6>
+                            <small class="text-success">COMPRA</small>
+                        </div>
+                        <p class="mb-1">Target: $44,000 | Stop: $41,500</p>
+                        <small class="text-muted">3 minutos atrás</small>
+                    </a>
+                    <a href="#" class="list-group-item bg-transparent text-light">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Day Trading Analysis</h6>
+                            <small class="text-danger">VENDA</small>
+                        </div>
+                        <p class="mb-1">Target: $41,000 | Stop: $43,500</p>
+                        <small class="text-muted">15 minutos atrás</small>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4>Indicadores Técnicos</h4>
+                    <span class="badge bg-primary">Atualizado</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover">
+                        <tbody>
+                            <tr>
+                                <td>RSI (14)</td>
+                                <td class="text-end">65.5</td>
+                                <td><span class="badge bg-success">COMPRA</span></td>
+                            </tr>
+                            <tr>
+                                <td>MACD</td>
+                                <td class="text-end">125.3</td>
+                                <td><span class="badge bg-success">COMPRA</span></td>
+                            </tr>
+                            <tr>
+                                <td>Bollinger Bands</td>
+                                <td class="text-end">Upper: 43,500</td>
+                                <td><span class="badge bg-warning">NEUTRO</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Market Overview -->
+<div class="card">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4>Visão Geral do Mercado</h4>
+            <div>
+                <button class="btn btn-sm btn-outline-primary me-2">1H</button>
+                <button class="btn btn-sm btn-outline-primary me-2">24H</button>
+                <button class="btn btn-sm btn-outline-primary">7D</button>
+            </div>
+        </div>
+        <div style="height: 300px; background: var(--dark-bg); border-radius: 8px;" class="d-flex align-items-center justify-content-center">
+            <p class="text-muted">Gráfico será carregado aqui</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelector('.refresh-data').addEventListener('click', async function() {
+    const button = this;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Atualizando...';
+    button.disabled = true;
+
+    try {
+        const response = await fetch("{% url 'dashboard:refresh_data' %}");
+        const data = await response.json();
+        
+        if (data.success) {
+            // Atualizar preço
+            document.querySelector('.bitcoin-price').textContent = `$${data.data.price.toFixed(2)}`;
+            
+            // Atualizar variação
+            const changeEl = document.querySelector('.price-change');
+            const changeValue = data.data.change_24h;
+            changeEl.textContent = `${changeValue > 0 ? '+' : ''}${changeValue.toFixed(2)}%`;
+            changeEl.className = `price-change text-${changeValue > 0 ? 'success' : 'danger'}`;
+            
+            // Atualizar volume
+            document.querySelector('.volume-24h').textContent = `$${(data.data.volume_24h / 1e9).toFixed(1)}B`;
+            
+            // Atualizar dominância
+            document.querySelector('.btc-dominance').textContent = `${data.data.dominance.toFixed(1)}%`;
+            
+            // Atualizar análises
+            updateAnalysis(data.data.analysis);
+        } else {
+            console.error('Error refreshing data:', data.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    } finally {
+        button.innerHTML = '<i class="fas fa-sync-alt me-2"></i>Atualizar Dados';
+        button.disabled = false;
+    }
+});
+
+function updateAnalysis(analysis) {
+    // Atualizar indicadores técnicos
+    const indicators = document.querySelectorAll('.technical-indicator');
+    analysis.indicators.forEach((indicator, index) => {
+        if (indicators[index]) {
+            indicators[index].querySelector('.value').textContent = indicator.value;
+            indicators[index].querySelector('.signal').textContent = indicator.signal;
+            indicators[index].querySelector('.signal').className = 
+                `badge bg-${indicator.signal === 'COMPRA' ? 'success' : indicator.signal === 'VENDA' ? 'danger' : 'warning'}`;
+        }
+    });
+}
+</script>
+{% endblock %}

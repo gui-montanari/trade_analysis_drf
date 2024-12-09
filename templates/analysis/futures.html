@@ -1,0 +1,188 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Futures Trading Analysis - Crypto Analyzer{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Coluna da Esquerda - Informações de Mercado -->
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <img src="https://assets.coingecko.com/coins/images/1/small/bitcoin.png" alt="Bitcoin" class="me-2" style="width: 32px;">
+                    <h2 class="mb-0">Bitcoin</h2>
+                    <span class="badge bg-secondary ms-2">BTC</span>
+                </div>
+
+                <div class="price-display mb-3">
+                    <div class="h2 mb-0">${{ market_data.price|floatformat:2 }}</div>
+                    <span class="badge {% if market_data.change_24h >= 0 %}bg-success{% else %}bg-danger{% endif %}">
+                        {{ market_data.change_24h|floatformat:2 }}%
+                    </span>
+                </div>
+
+                <div class="market-stats">
+                    <!-- Volume -->
+                    <div class="mb-3">
+                        <div class="text-muted mb-1">Volume 24h</div>
+                        <div class="h5">${{ market_data.volume_24h|floatformat:2 }}B</div>
+                    </div>
+
+                    <!-- Funding Rate -->
+                    <div class="mb-3">
+                        <div class="text-muted mb-1">Funding Rate</div>
+                        <div class="h5 {% if market_data.funding_rate >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            {{ market_data.funding_rate|floatformat:4 }}%
+                        </div>
+                    </div>
+
+                    <!-- Open Interest -->
+                    <div class="mb-3">
+                        <div class="text-muted mb-1">Open Interest</div>
+                        <div class="h5">${{ market_data.open_interest|floatformat:2 }}B</div>
+                    </div>
+                </div>
+
+                <!-- Indicadores Técnicos -->
+                <div class="technical-indicators mt-4">
+                    <h5 class="mb-3">Indicadores Técnicos</h5>
+                    {% for indicator in indicators %}
+                    <div class="indicator-card mb-3 p-3 border-start border-4 {% if indicator.signal == 'buy' %}border-success{% elif indicator.signal == 'sell' %}border-danger{% else %}border-warning{% endif %}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>{{ indicator.name }}</span>
+                            <span class="badge {% if indicator.signal == 'buy' %}bg-success{% elif indicator.signal == 'sell' %}bg-danger{% else %}bg-warning{% endif %}">
+                                {{ indicator.value }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Coluna da Direita - Análises -->
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3>Análise Futures Trading (10x)</h3>
+                    <div>
+                        <span class="badge {% if signal.type == 'buy' %}bg-success{% elif signal.type == 'sell' %}bg-danger{% else %}bg-secondary{% endif %}">
+                            {{ signal.signal|upper }}
+                        </span>
+                        <button class="btn btn-sm btn-primary ms-2 refresh-analysis">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Níveis de Operação -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card bg-dark">
+                            <div class="card-body text-center">
+                                <h6 class="text-muted">Entrada</h6>
+                                <div class="h4">${{ signal.entry_price|floatformat:2 }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-dark">
+                            <div class="card-body text-center">
+                                <h6 class="text-muted">Stop Loss</h6>
+                                <div class="h4 text-danger">${{ signal.stop_loss|floatformat:2 }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-dark">
+                            <div class="card-body text-center">
+                                <h6 class="text-muted">Take Profit</h6>
+                                <div class="h4 text-success">${{ signal.take_profit|floatformat:2 }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Métricas de Risco -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5>Métricas de Risco</h5>
+                        <div class="table-responsive">
+                            <table class="table table-dark">
+                                <tbody>
+                                    <tr>
+                                        <td>Risco/Retorno</td>
+                                        <td class="text-end">{{ risk_metrics.risk_reward|floatformat:2 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Retorno Potencial (10x)</td>
+                                        <td class="text-end text-success">{{ risk_metrics.potential_return|floatformat:1 }}%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Risco Máximo (10x)</td>
+                                        <td class="text-end text-danger">{{ risk_metrics.max_risk|floatformat:1 }}%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recomendações -->
+                <div class="recommendations">
+                    <h5>Recomendações</h5>
+                    <ul class="list-unstyled">
+                        {% for rec in recommendations %}
+                        <li class="mb-2">
+                            <i class="fas {{ rec.icon }} text-{{ rec.type }} me-2"></i>
+                            {{ rec.text }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelector('.refresh-analysis').addEventListener('click', async function() {
+    const button = this;
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+    try {
+        const response = await fetch("{% url 'analysis:refresh_futures' %}");
+        const data = await response.json();
+        
+        if (data.success) {
+            // Atualizar a página
+            location.reload();
+        } else {
+            console.error('Error:', data.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    } finally {
+        button.disabled = false;
+        button.innerHTML = '<i class="fas fa-sync-alt"></i>';
+    }
+});
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.indicator-card {
+    background-color: rgba(44, 47, 54, 0.5);
+}
+
+.bg-dark {
+    background-color: #1a1d26 !important;
+}
+</style>
+{% endblock %}

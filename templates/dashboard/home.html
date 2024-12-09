@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2>Olá, {{ user.username }}!</h2>
+        <p class="text-muted">Bem-vindo ao seu painel de análise de criptomoedas</p>
+    </div>
+    <div class="col-md-6 text-end">
+        <button class="btn btn-primary">
+            <i class="fas fa-sync-alt me-2"></i>Atualizar Dados
+        </button>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stats-card">
+            <h6 class="text-muted mb-2">Bitcoin Price</h6>
+            <div class="quick-stats">$42,350</div>
+            <span class="text-success">
+                <i class="fas fa-caret-up"></i> 2.5%
+            </span>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card">
+            <h6 class="text-muted mb-2">24h Volume</h6>
+            <div class="quick-stats">$28.5B</div>
+            <span class="text-danger">
+                <i class="fas fa-caret-down"></i> 1.2%
+            </span>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card">
+            <h6 class="text-muted mb-2">Dominance</h6>
+            <div class="quick-stats">48.2%</div>
+            <span class="text-success">
+                <i class="fas fa-caret-up"></i> 0.5%
+            </span>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card">
+            <h6 class="text-muted mb-2">Market Sentiment</h6>
+            <div class="quick-stats">Bullish</div>
+            <span class="badge bg-success">Strong</span>
+        </div>
+    </div>
+</div>
+
+<!-- Latest Analysis -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="dashboard-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4>Análises Recentes</h4>
+                <a href="#" class="btn btn-sm btn-outline-primary">Ver Todas</a>
+            </div>
+            <div class="list-group">
+                <a href="#" class="list-group-item bg-transparent text-light">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">Futures Trading Analysis</h6>
+                        <small class="text-success">COMPRA</small>
+                    </div>
+                    <p class="mb-1">Target: $44,000 | Stop: $41,500</p>
+                    <small class="text-muted">3 minutos atrás</small>
+                </a>
+                <a href="#" class="list-group-item bg-transparent text-light">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">Day Trading Analysis</h6>
+                        <small class="text-danger">VENDA</small>
+                    </div>
+                    <p class="mb-1">Target: $41,000 | Stop: $43,500</p>
+                    <small class="text-muted">15 minutos atrás</small>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="dashboard-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4>Indicadores Técnicos</h4>
+                <span class="badge bg-primary">Atualizado</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-dark table-hover">
+                    <tbody>
+                        <tr>
+                            <td>RSI (14)</td>
+                            <td class="text-end">65.5</td>
+                            <td><span class="badge bg-success">COMPRA</span></td>
+                        </tr>
+                        <tr>
+                            <td>MACD</td>
+                            <td class="text-end">125.3</td>
+                            <td><span class="badge bg-success">COMPRA</span></td>
+                        </tr>
+                        <tr>
+                            <td>Bollinger Bands</td>
+                            <td class="text-end">Upper: 43,500</td>
+                            <td><span class="badge bg-warning">NEUTRO</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Market Overview -->
+<div class="row">
+    <div class="col-12">
+        <div class="dashboard-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4>Visão Geral do Mercado</h4>
+                <div>
+                    <button class="btn btn-sm btn-outline-primary me-2">1H</button>
+                    <button class="btn btn-sm btn-outline-primary me-2">24H</button>
+                    <button class="btn btn-sm btn-outline-primary">7D</button>
+                </div>
+            </div>
+            <div class="market-overview-chart" style="height: 300px;">
+                <!-- Aqui irá o gráfico -->
+                <div class="text-center text-muted py-5">
+                    Gráfico de Preços será carregado aqui
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,245 @@
+{% extends 'analysis/base_analysis.html' %}
+
+{% block title %}Análise Swing Trading{% endblock %}
+
+{% block market_info %}
+<div class="market-info">
+    <!-- Conteúdo similar ao day trading, mas com foco em timeframes maiores -->
+    <div class="d-flex align-items-center mb-3">
+        <img src="https://assets.coingecko.com/coins/images/1/small/bitcoin.png" alt="Bitcoin" class="me-2" height="32">
+        <h2 class="mb-0">Bitcoin</h2>
+        <div class="ms-auto">
+            <select class="form-select bg-dark text-light" id="timeframe-selector">
+                <option value="4h">4h</option>
+                <option value="1d">1d</option>
+                <option value="1w">1w</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="price-large mb-3">
+        ${{ price }}
+        <span class="text-{% if price_change >= 0 %}success{% else %}danger{% endif %} ms-2" style="font-size: 1rem;">
+            <i class="fas fa-caret-{% if price_change >= 0 %}up{% else %}down{% endif %}"></i>
+            {{ price_change|floatformat:2 }}%
+        </span>
+    </div>
+
+    <!-- Market Structure -->
+    <div class="market-stat">
+        <h6>Estrutura de Mercado</h6>
+        <div class="d-flex justify-content-between align-items-center">
+            <span>Fase Atual</span>
+            <span class="badge bg-primary">{{ market_phase }}</span>
+        </div>
+    </div>
+
+    <!-- Trend Analysis -->
+    <div class="market-stat">
+        <h6>Análise de Tendência</h6>
+        <div class="mb-2">
+            <span class="text-muted">Tendência Primária:</span>
+            <span class="float-end text-{{ primary_trend.color }}">{{ primary_trend.direction }}</span>
+        </div>
+        <div class="mb-2">
+            <span class="text-muted">Tendência Secundária:</span>
+            <span class="float-end text-{{ secondary_trend.color }}">{{ secondary_trend.direction }}</span>
+        </div>
+    </div>
+
+    <!-- Key Levels -->
+    <div class="market-stat">
+        <h6>Níveis Importantes</h6>
+        {% for level in key_levels %}
+        <div class="mb-2">
+            <span class="text-muted">{{ level.name }}:</span>
+            <span class="float-end">${{ level.value|floatformat:2 }}</span>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Technical Indicators -->
+    <h5 class="mt-4 mb-3">Indicadores Técnicos</h5>
+    {% for indicator in technical_indicators %}
+    <div class="indicator-card {{ indicator.signal }}">
+        <div class="d-flex justify-content-between align-items-center">
+            <span>{{ indicator.name }}</span>
+            <span class="analysis-badge badge-{{ indicator.signal }}">
+                {{ indicator.value }}
+            </span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block analysis_content %}
+<div class="analysis-content">
+    <!-- Conteúdo similar ao day trading, mas com foco em swings -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>Análise Swing Trading</h3>
+        <div>
+            <span class="analysis-badge badge-{{ signal_type }}">{{ signal }}</span>
+            <span class="ms-2 text-muted">Atualizado {{ last_update }}</span>
+        </div>
+    </div>
+
+    <!-- Market Analysis -->
+    <div class="card bg-darker mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Análise de Mercado</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="text-muted">Força da Tendência</div>
+                    <div class="h5">{{ trend_strength }}%</div>
+                    <small class="text-muted">{{ trend_description }}</small>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-muted">Momento</div>
+                    <div class="h5">{{ momentum_score }}%</div>
+                    <small class="text-muted">{{ momentum_description }}</small>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-muted">Volatilidade</div>
+                    <div class="h5">{{ volatility|floatformat:1 }}%</div>
+                    <small class="text-muted">{{ volatility_description }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trade Setup -->
+    <div class="card bg-darker mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Setup de Trade</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="p-3 rounded bg-opacity-10 {% if signal_type == 'buy' %}bg-success{% else %}bg-danger{% endif %}">
+                        <div class="text-muted mb-1">Entrada</div>
+                        <div class="h5 mb-0">${{ entry_price|floatformat:2 }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 rounded bg-danger bg-opacity-10">
+                        <div class="text-muted mb-1">Stop Loss</div>
+                        <div class="h5 mb-0">${{ stop_loss|floatformat:2 }}</div>
+                        <small class="text-muted">-{{ stop_loss | abs|floatformat:1 }}%</small>
+                            <!-- Trade Setup (continuação) -->
+                            <div class="card bg-darker mb-4">
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <div class="p-3 rounded bg-opacity-10 bg-success">
+                                                <div class="text-muted mb-1">Take Profit 1</div>
+                                                <div class="h5 mb-0">${{ take_profit_1|floatformat:2 }}</div>
+                                                <small class="text-muted">+{{ tp1_percent|floatformat:1 }}%</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="p-3 rounded bg-success bg-opacity-10">
+                                                <div class="text-muted mb-1">Take Profit 2</div>
+                                                <div class="h5 mb-0">${{ take_profit_2|floatformat:2 }}</div>
+                                                <small class="text-muted">+{{ tp2_percent|floatformat:1 }}%</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="p-3 rounded bg-success bg-opacity-10">
+                                                <div class="text-muted mb-1">Take Profit 3</div>
+                                                <div class="h5 mb-0">${{ take_profit_3|floatformat:2 }}</div>
+                                                <small class="text-muted">+{{ tp3_percent|floatformat:1 }}%</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <!-- Time Analysis -->
+                            <div class="card bg-darker mb-4">
+                                <div class="card-body">
+                                    <h5 class="card-title">Análise Temporal</h5>
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <div class="text-muted">Duração Esperada</div>
+                                            <div class="h5">{{ expected_duration }}</div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="text-muted">Tendência Atual</div>
+                                            <div class="h5">{{ current_trend_duration }}</div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="text-muted">Próximo Evento</div>
+                                            <div class="h5">{{ next_event }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <!-- Risk Management -->
+                            <div class="card bg-darker mb-4">
+                                <div class="card-body">
+                                    <h5 class="card-title">Gestão de Risco</h5>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>Métricas de Risco</h6>
+                                            <ul class="list-unstyled">
+                                                <li class="mb-2">
+                                                    <i class="fas fa-balance-scale text-primary me-2"></i>
+                                                    Risco/Retorno: {{ risk_reward|floatformat:2 }}
+                                                </li>
+                                                <li class="mb-2">
+                                                    <i class="fas fa-chart-pie text-warning me-2"></i>
+                                                    Posição Recomendada: {{ position_size }}%
+                                                </li>
+                                                <li class="mb-2">
+                                                    <i class="fas fa-clock text-info me-2"></i>
+                                                    Stop Trailing: {{ trailing_stop }}%
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Recomendações</h6>
+                                            <ul class="list-unstyled">
+                                                {% for rec in risk_recommendations %}
+                                                <li class="mb-2">
+                                                    <i class="fas {{ rec.icon }} text-{{ rec.type }} me-2"></i>
+                                                    {{ rec.text }}
+                                                </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <!-- Trading Plan -->
+                            <div class="card bg-darker">
+                                <div class="card-body">
+                                    <h5 class="card-title">Plano de Trading</h5>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>Pontos de Entrada</h6>
+                                            <ul class="list-unstyled">
+                                                {% for entry in entry_points %}
+                                                <li class="mb-2">
+                                                    <i class="fas fa-arrow-right text-primary me-2"></i>
+                                                    {{ entry }}
+                                                </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Pontos de Saída</h6>
+                                            <ul class="list-unstyled">
+                                                {% for exit in exit_points %}
+                                                <li class="mb-2">
+                                                    <i class="fas fa-arrow-left text-warning me-2"></i>
+                                                    {{ exit }}
+                                                </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endblock %}
